@@ -6,7 +6,7 @@ class gps_recordHandler
 public:
 	gps_recordHandler()
 	{
-		fout.open("/home/wuconglei/gps_data/rawdata_record", std::ios::app);
+		fout.open("/home/wuconglei/gps_data/rawdata_record");
 		gps_sub = nh.subscribe("gps_anpp", 10, &gps_recordHandler::gps_recordCallback, this);
 		
 	}
