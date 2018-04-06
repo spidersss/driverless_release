@@ -40,7 +40,7 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, do
 {
 	sensor_msgs::PointCloud2 output;
 	PointCloud cloud_filtered;
-	std::cout<<cloud.points.size()<<std::endl;
+	//std::cout<<cloud.points.size()<<std::endl;
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
@@ -54,7 +54,7 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, do
 	cloud_filtered.width = cloud_filtered.points.size ();
   	cloud_filtered.height = 1;
   	cloud_filtered.is_dense = false;
-	std::cout<<cloud_filtered.points.size()<<std::endl;
+	//std::cout<<cloud_filtered.points.size()<<std::endl;
 	
 	return cloud_filtered;
 }
