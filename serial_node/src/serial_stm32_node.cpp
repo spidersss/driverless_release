@@ -4,13 +4,16 @@
 #include <std_msgs/Float64.h>
 #include "serial_node/serial_receive.h"
 #include "serial_node/serial_send.h"
-
+#include <math.h>
+#include <iostream>
+#define DEG2RAD(x) ((x)*M_PI/180)
 #define u8 unsigned char 
 #define recvNum 2
 #define sendNum 2
 #define recvsize 7
 #define sendsize 9
 #define RAD2DEG(x) ((x)*180./M_PI)
+#define DEG2RAD(x) ((x)*M_PI/180)
  
 u8 recvbuff[recvsize];
 u8 sendbuff[sendsize];
@@ -91,8 +94,10 @@ void pid_callback(const std_msgs::Float64::ConstPtr& sendmsg)
 	short temp = 0;
 	double str;
 	send_data[0] = 16500;
-	str = sendmsg->data;
-	temp = (short)(27*str);
+	//str = sendmsg->data;
+	str = atan(sin(DEG2RAD(sendmsg->data))/2.24f);
+	std::cout<<RAD2DEG(str)<<std::endl;
+	temp = (short)(27*RAD2DEG(str));
 	if(temp<-550)
 	{
 		temp = -550;
@@ -119,14 +124,15 @@ int main (int argc, char** argv)
 	ros::NodeHandle nh; 
 
 	//订阅主题，并配置回调函数 
-	ros::Subscriber pid_sub = nh.subscribe("control_effort", 1000, pid_callback); 
+	ros::Subscriber pid_sub = nh.subscribe("lidar_steer", 1000, pid_callback); 
 	//发布主题 
 	ros::Publisher read_pub = nh.advertise<serial_node::serial_receive>("receive", 1000); 
 
 	try 
 	{ 
 		//设置串口属性，并打开串口 
-		ser.setPort("/dev/stm32"); 
+		//ser.setPort("/dev/stm32");
+		ser.setPort("/dev/ttyUSB0"); 
 		ser.setBaudrate(115200); 
 		serial::Timeout to = serial::Timeout::simpleTimeout(1000); 
 		ser.setTimeout(to); 

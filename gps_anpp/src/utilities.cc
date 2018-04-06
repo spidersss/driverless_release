@@ -15,25 +15,26 @@ void gpsCallback(const gps_anpp::gps_data::ConstPtr& gps_msg)
 	yaw_error = t_yaw - yaw_now;
 	  
 	steer.data = yaw_error*(-5.0) + 90;
-	  ROS_INFO("yaw_error:%f\tdis_error:%f", yaw_error, dis_error);
-	  if(steer.data < 60) steer.data = 60;
-	  if(steer.data > 120) steer.data = 120;
-	  ROS_INFO("t_yaw: %f\tnowYaw%f\tdisToend: %f", t_yaw,yaw_now, disToend);	
+	ROS_INFO("yaw_error:%f\tdis_error:%f", yaw_error, dis_error);
+	if(steer.data < 60) steer.data = 60;
+	if(steer.data > 120) steer.data = 120;
+	ROS_INFO("t_yaw: %f\tnowYaw%f\tdisToend: %f", t_yaw,yaw_now, disToend);	
 	  
-	  disToend = distance(gps_msg->lat, gps_msg->lon, endlat[count], endlon[count]);
-	  if( disToend < 3 ){
-		count++;
-	  }
-	  steer_pub.publish(steer);
+	disToend = distance(gps_msg->lat, gps_msg->lon, endlat[count], endlon[count]);
+	if( disToend < 3 ){
+		if(count < endlat.size() - 1) count ++;
 	}
+	steer_pub.publish(steer);
+}
 
 int main(int argc, char **argv)
 {
 
   ros::init(argc, argv, "gps_steer");
   ros::NodeHandle n;
-  std::ifstream fin("~/gps_data/trajectory_points");
+  std::ifstream fin("/home/wuconglei/gps_data/trajectory_points");
   while(fin>>latitude>>longitude){
+  	std::cout<<std::setprecision(8)<<std::setiosflags(std::ios::fixed)<<latitude<<"\t"<<longitude<<"\n";
   	endlat.push_back(latitude);
   	endlon.push_back(longitude);
   }

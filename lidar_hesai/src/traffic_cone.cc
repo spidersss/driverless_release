@@ -8,7 +8,7 @@ void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 	pcl::fromROSMsg(cloud_msg, cloud_init);
 	
 	PointCloud cloud_parted;
-	cloud_parted = space_part(cloud_init, 4.0, -50.0, -0.1);
+	cloud_parted = space_part(cloud_init, 2.0, -50.0, -0.05);
 	
 	//PointCloud cloud_filtered;
 	//cloud_filtered = outlier_filter(cloud_parted, 5, 1.0);//滤去离群值，参数未调好
@@ -29,8 +29,8 @@ int main(int argc, char** argv)
 	ros::init (argc, argv, "pcl_test");
 	ros::NodeHandle n;
 	
-	ros::Subscriber sub = n.subscribe("pandar_points", 1, cloud_cb);
-	pubxyz = n.advertise<sensor_msgs::PointCloud2> ("filter_z", 1);
-	pub_steer = n.advertise<std_msgs::Float64> ("lidar_steer", 1);
+	ros::Subscriber sub = n.subscribe("pandar_points", 10, cloud_cb);
+	pubxyz = n.advertise<sensor_msgs::PointCloud2> ("filter_z", 10);
+	pub_steer = n.advertise<std_msgs::Float64> ("lidar_steer", 10);
 	ros::spin();
 }
