@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lidar_hesai)
+project(serial_node)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,12 +8,11 @@ project(lidar_hesai)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  
-  pcl_conversions
-  pcl_ros
   roscpp
-  sensor_msgs
   std_msgs
+  rospy
+  message_generation
+  serial
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,11 +49,13 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
+ add_message_files(
+   FILES
 #   Message1.msg
 #   Message2.msg
-# )
+   serial_receive.msg
+   serial_send.msg	
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -71,10 +72,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   #   sensor_msgs#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -106,10 +107,11 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-#  LIBRARIES lidar_hesai
-  CATKIN_DEPENDS  pcl_conversions pcl_ros roscpp sensor_msgs std_msgs
+#  INCLUDE_DIRS include
+#  LIBRARIES serial_node
+#  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
+   CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -119,13 +121,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/lidar_hesai.cpp
+#   src/${PROJECT_NAME}/serial_node.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -136,7 +138,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/lidar_hesai_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/serial_node_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,29 +177,40 @@ include_directories(
 # )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h"
-   PATTERN ".svn" EXCLUDE
-)
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_lidar_hesai.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_serial_node.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-add_executable(traffic_cone src/traffic_cone.cc)
-target_link_libraries(traffic_cone ${catkin_LIBRARIES})
-add_dependencies(traffic_cone ${catkin_EXPORTED_TARGETS})
+include_directories(
+	include
+	${catkin_INCLUDE_DIRS}
+)
+
+add_executable(serial_stm32_node src/serial_stm32_node.cpp)
+add_dependencies(serial_stm32_node serial_node_generate_messages_cpp)
+target_link_libraries(serial_stm32_node ${catkin_LIBRARIES})
+
+add_executable(serial_suanfa_node src/serial_suanfa_node.cpp)
+add_dependencies(serial_suanfa_node serial_node_generate_messages_cpp)
+target_link_libraries(serial_suanfa_node ${catkin_LIBRARIES})
