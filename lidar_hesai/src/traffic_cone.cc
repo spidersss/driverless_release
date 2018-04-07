@@ -8,7 +8,7 @@ void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 	pcl::fromROSMsg(cloud_msg, cloud_init);
 	
 	PointCloud cloud_parted;
-	cloud_parted = space_part(cloud_init, 2.0, -50.0, -0.05);
+	cloud_parted = space_part(cloud_init, 3.0, -20.0, 0);
 	
 	//PointCloud cloud_filtered;
 	//cloud_filtered = outlier_filter(cloud_parted, 5, 1.0);//滤去离群值，参数未调好

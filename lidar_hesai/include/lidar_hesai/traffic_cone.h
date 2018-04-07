@@ -99,7 +99,7 @@ PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int M
   	point_center.y = 0;
   	point_center.z = 0;
   	std::cout<<"id:"<<j+1<<"\t";
-  	if(it->indices.size() > 500) continue;//将较大的物体，例如人排除掉
+  	if(it->indices.size() > 300) continue;//将较大的物体，例如人排除掉
     for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)	{
      //设置保存点云的属性问题
 	count ++;
