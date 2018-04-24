@@ -15,7 +15,7 @@ void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 
 int main(int argc, char** argv)
 {
-	ros::init (argc, argv, "pcl_test");
+	ros::init (argc, argv, "clustered");
 	ros::NodeHandle n;
 	
 	ros::Subscriber sub = n.subscribe("parted_points", 10, cloud_cb);

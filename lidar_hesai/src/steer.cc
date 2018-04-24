@@ -13,7 +13,7 @@ void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 
 int main(int argc, char** argv)
 {
-	ros::init (argc, argv, "pcl_test");
+	ros::init (argc, argv, "steer");
 	ros::NodeHandle n;
 	
 	ros::Subscriber sub = n.subscribe("center_points", 10, cloud_cb);

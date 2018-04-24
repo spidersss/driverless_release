@@ -35,8 +35,7 @@ PointCloud outlier_filter(PointCloud cloud, int MeanK, double Thresh);
 PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int MaxSize);
 double steerCreator(PointCloud cloud);
 #endif
-
-PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, double z_distance)
+PointCloud space_part(PointCloud cloud, double x_distance, double y_distance)
 {
 	sensor_msgs::PointCloud2 output;
 	PointCloud cloud_filtered;
@@ -44,9 +43,39 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, do
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
-		if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z > z_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
+		
+		if(it->x > (x_distance - 0.2) && it->x < (x_distance + 0.2)&& it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
+			it->x = 0;
 			cloud_filtered.points.push_back (*it);
-			std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
+			//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
+		}
+	}
+	cloud_filtered.header = cloud.header;
+	cloud_filtered.width = cloud_filtered.points.size ();
+  	cloud_filtered.height = 1;
+  	cloud_filtered.is_dense = false;
+	//std::cout<<cloud_filtered.points.size()<<std::endl;
+	
+	return cloud_filtered;
+}
+
+PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, std::vector<double> z_distance)
+{
+	sensor_msgs::PointCloud2 output;
+	PointCloud cloud_filtered;
+	//std::cout<<cloud.points.size()<<std::endl;
+	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
+	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
+	{	
+		if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
+			int zzz = int(-1*it->y*4);
+			if(it->y > 0) zzz = 0;
+			if(zzz > 80) continue;
+			//std::cout<<zzz<<std::endl;
+			if(it->z > (z_distance[zzz] + 0.1)){
+				cloud_filtered.points.push_back (*it);
+				//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
+			}
 		}
 		
 	}

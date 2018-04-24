@@ -209,3 +209,7 @@ add_dependencies(clustered ${catkin_EXPORTED_TARGETS})
 add_executable(steer src/steer.cc)
 target_link_libraries(steer ${catkin_LIBRARIES})
 add_dependencies(steer ${catkin_EXPORTED_TARGETS})
+
+add_executable(road src/road.cc)
+target_link_libraries(road ${catkin_LIBRARIES})
+add_dependencies(road ${catkin_EXPORTED_TARGETS})
