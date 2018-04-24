@@ -198,6 +198,14 @@ install(DIRECTORY launch/
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-add_executable(traffic_cone src/traffic_cone.cc)
-target_link_libraries(traffic_cone ${catkin_LIBRARIES})
-add_dependencies(traffic_cone ${catkin_EXPORTED_TARGETS})
+add_executable(parted src/parted.cc)
+target_link_libraries(parted ${catkin_LIBRARIES})
+add_dependencies(parted ${catkin_EXPORTED_TARGETS})
+
+add_executable(clustered src/clustered.cc)
+target_link_libraries(clustered ${catkin_LIBRARIES})
+add_dependencies(clustered ${catkin_EXPORTED_TARGETS})
+
+add_executable(steer src/steer.cc)
+target_link_libraries(steer ${catkin_LIBRARIES})
+add_dependencies(steer ${catkin_EXPORTED_TARGETS})

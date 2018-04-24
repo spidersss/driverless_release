@@ -44,11 +44,11 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, do
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
-		
 		if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z > z_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
 			cloud_filtered.points.push_back (*it);
-			//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
+			std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
 		}
+		
 	}
 	cloud_filtered.header = cloud.header;
 	cloud_filtered.width = cloud_filtered.points.size ();

@@ -1,7 +1,7 @@
 #include "lidar_hesai/traffic_cone.h"
 ros::Publisher pubxyz;
 ros::Publisher pub_steer;
-
+//////分开运行，多线程
 void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 {
 	PointCloud cloud_init;
