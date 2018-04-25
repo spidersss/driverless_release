@@ -34,29 +34,45 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, do
 PointCloud outlier_filter(PointCloud cloud, int MeanK, double Thresh);
 PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int MaxSize);
 double steerCreator(PointCloud cloud);
+std::vector<double> zCreator(PointCloud cloud, double x_distance, double y_distance);
 #endif
-PointCloud space_part(PointCloud cloud, double x_distance, double y_distance)
+std::vector<double> zCreator(PointCloud cloud, double x_distance, double y_distance)
 {
-	sensor_msgs::PointCloud2 output;
-	PointCloud cloud_filtered;
 	//std::cout<<cloud.points.size()<<std::endl;
+	std::vector<double> heightMax;
+	std::vector<double> heightMin;
+	for(int i = 0; i < 40; i++) heightMax.push_back(-1.0);
+	for(int i = 0; i < 40; i++) heightMin.push_back(1.0);
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
 		
-		if(it->x > (x_distance - 0.2) && it->x < (x_distance + 0.2)&& it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
-			it->x = 0;
-			cloud_filtered.points.push_back (*it);
+		if(it->x > (x_distance - 0.5) && it->x < (x_distance + 0.5)&& it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
+			int index = int(-1*it->y*2);
+			if(it->y >0 ) index = 0;
+			if(index > 80) continue;
+			//std::cout<<index<<std::endl;
+			/*
+			std::cout<<it->y<<std::endl;
+			std::cout<<index<<std::endl;
+			std::cout<<"Max:"<<heightMax[index]<<std::endl;
+			std::cout<<"Min:"<<heightMin[index]<<std::endl;
+			*/
+			if(it->z > heightMax[index]) heightMax[index] = it->z;
+			if(it->z < heightMin[index]) heightMin[index] = it->z;
+			
 			//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
 		}
+		if(heightMax[0]  < -0.5) heightMax[0] =  heightMax[1];
+		for(int j = 0; j <20 ; j++){
+			if((heightMax[j] - heightMin[j]) > 0.1) heightMax[j] = heightMin[j]+0.05;
+			if(heightMax[j] < -0.5 && j != 0) heightMax[j] = heightMax[j-1] + 0.05;
+		}
+		
 	}
-	cloud_filtered.header = cloud.header;
-	cloud_filtered.width = cloud_filtered.points.size ();
-  	cloud_filtered.height = 1;
-  	cloud_filtered.is_dense = false;
-	//std::cout<<cloud_filtered.points.size()<<std::endl;
 	
-	return cloud_filtered;
+	
+	return heightMax;
 }
 
 PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, std::vector<double> z_distance)
@@ -68,7 +84,7 @@ PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, st
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
 		if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
-			int zzz = int(-1*it->y*4);
+			int zzz = int(-1*it->y*2);
 			if(it->y > 0) zzz = 0;
 			if(zzz > 80) continue;
 			//std::cout<<zzz<<std::endl;
