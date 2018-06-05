@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	ros::init (argc, argv, "steer");
 	ros::NodeHandle n;
 	
-	ros::Subscriber sub = n.subscribe("center_points", 10, cloud_cb);
+	ros::Subscriber sub = n.subscribe("cluster_points", 10, cloud_cb);
 	pub_steer = n.advertise<std_msgs::Float64> ("lidar_steer", 10);
 	ros::spin();
 }

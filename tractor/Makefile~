@@ -1,0 +1,20 @@
+#!bin/bash
+main:main.o serial_open.o gps_com.o camera_com.o ni_com.o write2files.o
+	gcc -o main main.o serial_open.o gps_com.o camera_com.o ni_com.o write2files.o -lm
+main.o:main.c
+	gcc -c main.c -lm
+serial_open.o:serial_open.c serial_open.h
+	gcc -c serial_open.c -lm
+gps_com.o:gps_com.c gps_com.h serial_open.h
+	gcc -c gps_com.c
+camera_com.o:camera_com.c camera_com.h serial_open.h
+	gcc -c camera_com.c
+ni_com.o:ni_com.c ni_com.h serial_open.h
+	gcc -c ni_com.c
+write2files.o:./include/write2files.c write2files.h serial_open.h
+	gcc -c ./include/write2files.c
+
+.PHONY:clean
+clean:
+	rm *.o
+

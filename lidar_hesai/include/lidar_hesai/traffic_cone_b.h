@@ -31,107 +31,26 @@
 #endif
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;  
 PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, double z_distance);
-PointCloud space_part(PointCloud cloud, double slope);
 PointCloud outlier_filter(PointCloud cloud, int MeanK, double Thresh);
 PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int MaxSize);
 double steerCreator(PointCloud cloud);
-std::vector<double> zCreator(PointCloud cloud, double x_distance, double y_distance);
 #endif
-std::vector<double> zCreator(PointCloud cloud, double x_distance, double y_distance)
+
+PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, double z_distance)
 {
+	sensor_msgs::PointCloud2 output;
+	PointCloud cloud_filtered;
 	//std::cout<<cloud.points.size()<<std::endl;
-	std::vector<double> heightMax;
-	std::vector<double> heightMin;
-	for(int i = 0; i < 40; i++) heightMax.push_back(-1.0);
-	for(int i = 0; i < 40; i++) heightMin.push_back(1.0);
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
 	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
 	{	
 		
-		if(it->x > (x_distance - 0.5) && it->x < (x_distance + 0.5)&& it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
-			int index = int(-1*it->y*2);
-			if(it->y >0 ) index = 0;
-			if(index > 80) continue;
-			//std::cout<<index<<std::endl;
-			/*
-			std::cout<<it->y<<std::endl;
-			std::cout<<index<<std::endl;
-			std::cout<<"Max:"<<heightMax[index]<<std::endl;
-			std::cout<<"Min:"<<heightMin[index]<<std::endl;
-			*/
-			if(it->z > heightMax[index]) heightMax[index] = it->z;
-			if(it->z < heightMin[index]) heightMin[index] = it->z;
-			
+		/*if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z > z_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){*/
+		if((it->y < (it->x * 13.45 + 51.4375-10)) && (it->y > (it->x*13.45 + 51.4375 - 100 ))){
+			//it->x = 0;
+			cloud_filtered.points.push_back (*it);
 			//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
 		}
-		if(heightMax[0]  < -0.5) heightMax[0] =  heightMax[1];
-		for(int j = 0; j <20 ; j++){
-			if((heightMax[j] - heightMin[j]) > 0.1) heightMax[j] = heightMin[j]+0.05;
-			if(heightMax[j] < -0.5 && j != 0) heightMax[j] = heightMax[j-1] + 0.05;
-		}
-		
-	}
-	
-	
-	return heightMax;
-}
-
-PointCloud space_part(PointCloud cloud, double slope)///上坡，下坡保证有锥筒即可
-{
-	sensor_msgs::PointCloud2 output;
-	PointCloud cloud_filtered;
-	//std::cout<<cloud.points.size()<<std::endl;
-	//std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
-	/*for(it = cloud.points.begin(); it != cloud.points.end(); it++)
-	{	
-		if((it->z*it->z/(it->y*it->y+it->x*it->x))>slope){///利用点云到原点的斜率，椎筒点云更大
-			cloud_filtered.points.push_back (*it);
-		}
-		
-	}*/
-	
-	for(int i = 1; i < cloud.points.size(); i++)
-	{	
-		double z = cloud.points[i].z;
-		double y = cloud.points[i].y;
-		double x = cloud.points[i].x;
-		double z2 = cloud.points[i].z - cloud.points[i-1].z;
-		double y2 = cloud.points[i].y - cloud.points[i-1].y;
-		double x2 = cloud.points[i].x - cloud.points[i-1].x;
-		if(x > -5.0 && x < 5.0 && y < 0 && y > -20 && (z2*z2/(x2*x2+y2*y2))>slope &&  (x*x + y*y) > 0.8*0.8&& x !=NAN && y  != NAN && z != NAN){///检测斜率，椎捅斜率比路面大得多
-			cloud_filtered.points.push_back (cloud.points[i]);
-		}
-		
-	}
-	cloud_filtered.header = cloud.header;
-	cloud_filtered.width = cloud_filtered.points.size ();
-  	cloud_filtered.height = 1;
-  	cloud_filtered.is_dense = false;
-	//std::cout<<cloud_filtered.points.size()<<std::endl;
-	
-	return cloud_filtered;
-}
-
-
-PointCloud space_part(PointCloud cloud, double x_distance, double y_distance, std::vector<double> z_distance)
-{
-	sensor_msgs::PointCloud2 output;
-	PointCloud cloud_filtered;
-	//std::cout<<cloud.points.size()<<std::endl;
-	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
-	for(it = cloud.points.begin(); it != cloud.points.end(); it++)
-	{	
-		if(it->x > (-1.0 * x_distance) && it->x < x_distance && it->y < 0 && it->y > y_distance && it->z < 1 && it->x !=NAN && it->y  != NAN && it->z != NAN){
-			int zzz = int(-1*it->y*2);
-			if(it->y > 0) zzz = 0;
-			if(zzz > 80) continue;
-			//std::cout<<zzz<<std::endl;
-			if(it->z > (z_distance[zzz] + 0.1)){
-				cloud_filtered.points.push_back (*it);
-				//std::cout<<it->x<<"\t"<<it->y<<"\t"<<it->z<<std::endl;
-			}
-		}
-		
 	}
 	cloud_filtered.header = cloud.header;
 	cloud_filtered.width = cloud_filtered.points.size ();
@@ -212,46 +131,20 @@ PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int M
 
 double steerCreator(PointCloud cloud)
 {
-	double x = 0;
-	double y = 0;
-	double z = 0;
-	double center_x = 0;
-	double center_y = 0;
-	double disToNext = 0;
-	int left = -1;
-	int right = -1;
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator iter;
 	for(iter = cloud.points.begin(); iter != cloud.points.end(); iter++){
 		std::cout<<"x:"<<iter->x<<"\t"<<"y:"<<iter->y<<std::endl;
 	}
-  	for(int i = 0; i < cloud.points.size(); i ++){
-  		x = cloud.points[i].x;
-  		y = cloud.points[i].y;
-  		z = cloud.points[i].z;
-  		if(x < 0.0){
-  			if(right < 0 && (x*x + y*y) < 50.0) left = i;
-  			if(right >= 0 && ((x-cloud.points[right].x)*(x-cloud.points[right].x)+(y-cloud.points[right].y)*(y-cloud.points[right].y))<50.0) left = i; 
-  		}
-  		else{
-  			if(left < 0 && (x*x + y*y) < 50.0) right = i;
-  			if(left >= 0 && ((x-cloud.points[left].x)*(x-cloud.points[left].x)+(y-cloud.points[left].y)*(y-cloud.points[left].y))<30.0) right = i; 
-  		}
-  		if(left >=0 && right >= 0){
-	  		center_x = (cloud.points[left].x+cloud.points[right].x)/2.0;
-	  		center_y = (cloud.points[left].y+cloud.points[right].y)/2.0;
-			std::cout<<"left:"<<left<<" right:"<<right<<"("<<center_x<<","<<center_y<<")"<<std::endl;
-			disToNext = sqrt(center_x*center_x + center_y*center_y);
-			if(disToNext > 1.0){
-				double theta = (atan2(-1.0, 0) - atan2(center_y, center_x))/M_PI*180.0;	
-				std::cout<<"left"<<left<<" right"<<right<<":"<<theta<<"\tdisToNext:"<<disToNext<<std::endl;
-				return theta;
-			}
-			else{
-				left = -1;
-				right = -1;
-			}
+  	for(int i = 0; i < cloud.points.size(); i += 2){
+  		double center_x = (cloud.points[i].x+cloud.points[i+1].x)/2.0;
+  		double center_y = (cloud.points[i].y+cloud.points[i+1].y)/2.0;
+		std::cout<<"center"<<i/2+1<<"("<<center_x<<","<<center_y<<")"<<std::endl;
+		double disToNext = sqrt(center_x*center_x + center_y*center_y);
+		if( disToNext > 1.0){
+			double theta = (atan2(-1.0, 0) - atan2(center_y, center_x))/M_PI*180.0;	
+			std::cout<<"theta"<<i/2+1<<":"<<theta<<"\tdisToNext:"<<disToNext<<std::endl;
+			return theta;
 		}
-		
 	}
 	return -1;	
 }
