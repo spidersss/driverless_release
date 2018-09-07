@@ -220,7 +220,7 @@ double steerCreator(PointCloud cloud)
 	double disToNext = 0;
 	int left = -1;
 	int right = -1;
-	if(cloud.points.size()<2 || ((cloud.points[i].x*cloud.points[i].x +cloud.points[i].y*cloud.points[i].y) > 100)) return 10000.;
+	if(cloud.points.size()<2 || ((cloud.points[0].x*cloud.points[0].x +cloud.points[0].y*cloud.points[0].y) > 100)) return 10000.;
 	std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator iter;
 	for(iter = cloud.points.begin(); iter != cloud.points.end(); iter++){
 		std::cout<<"x:"<<iter->x<<"\t"<<"y:"<<iter->y<<std::endl;
