@@ -98,7 +98,7 @@ PointCloud space_part(PointCloud cloud, double slope)///上坡，下坡保证有
 		double z2 = cloud.points[i].z - cloud.points[i-1].z;
 		double y2 = cloud.points[i].y - cloud.points[i-1].y;
 		double x2 = cloud.points[i].x - cloud.points[i-1].x;
-		if(x > -5.0 && x < 5.0 && y < 0 && y > -20 && (z2*z2/(x2*x2+y2*y2))>slope &&  (x*x + y*y) > 0.8*0.8&& x !=NAN && y  != NAN && z != NAN){///检测斜率，椎捅斜率比路面大得多
+		if(x > -1.5 && x < 1.5 && y < 0 && y > -10 && ((z2*z2/(x2*x2+y2*y2))>slope || z > -0.5)&&  (x*x + y*y) > 0.3*0.3&& x !=NAN && y  != NAN && z != NAN ){///检测斜率，椎捅斜率比路面大得多//高度肯定高于地面的点云留
 			cloud_filtered.points.push_back (cloud.points[i]);
 		}
 		
@@ -174,24 +174,31 @@ PointCloud center_cluster(PointCloud cloud, double Tolerance, int MinSize, int M
   	//迭代访问点云索引cluster_indices,直到分割处所有聚类
   	int j = 0;
   	int count = 0;
+  	int count_z = 0;
   	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
   { 
   	//迭代容器中的点云的索引，并且分开每个点云的高度值
   	count = 0;
-  	point_center.x = 0;
-  	point_center.y = 0;
-  	point_center.z = 0;
+  	point_center.x = 0.;
+  	point_center.y = 0.;
+  	point_center.z = 0.;
   	std::cout<<"id:"<<j+1<<"\t";
-  	if(it->indices.size() > 300) continue;//将较大的物体，例如人排除掉
+  	if(it->indices.size() > 1000) continue;//将较大的物体，例如人排除掉
+  	count_z = 0;
     for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)	{
      //设置保存点云的属性问题
+     
 	count ++;
     //cloud_cluster.points.push_back (cloud.points[*pit]);
     
     point_center.x += cloud.points[*pit].x;
     point_center.y += cloud.points[*pit].y;
-    point_center.z = 0.0;
+    if(cloud.points[*pit].z > -0.2 && count_z<5) count_z++;//5个较高的点，才判为大椎捅
+    
     }
+    if(count_z == 5) point_center.z = 1.0;
+    else point_center.z = -1.0;
+    ////////////////////////////////////////////////////////大椎捅的高度定z为1,小定为-1;
     point_center.x /=  (double)count;
     point_center.y /=  (double)count;
     cloud_center.points.push_back(point_center);

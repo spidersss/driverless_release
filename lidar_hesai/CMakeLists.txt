@@ -221,3 +221,7 @@ add_dependencies(traffic_cone ${catkin_EXPORTED_TARGETS})
 add_executable(steer_tank src/steer_tank.cc)
 target_link_libraries(steer_tank ${catkin_LIBRARIES})
 add_dependencies(steer_tank ${catkin_EXPORTED_TARGETS})
+
+add_executable(parted2_bazi src/parted2_bazi.cc)
+target_link_libraries(parted2_bazi ${catkin_LIBRARIES})
+add_dependencies(parted2_bazi ${catkin_EXPORTED_TARGETS})

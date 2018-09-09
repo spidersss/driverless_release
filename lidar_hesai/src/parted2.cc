@@ -14,7 +14,7 @@ public:
 		pcl::fromROSMsg(cloud_msg, cloud_init);
 		
 		PointCloud cloud_parted;
-		cloud_parted = space_part(cloud_init, 0.1);
+		cloud_parted = space_part(cloud_init, 100.0);
 	
 		sensor_msgs::PointCloud2 output;
 		pcl::toROSMsg(cloud_parted, output);

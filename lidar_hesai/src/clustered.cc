@@ -6,7 +6,7 @@ void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 	pcl::fromROSMsg(cloud_msg, cloud_parted);
 	
 	PointCloud cloud_center;
-	cloud_center = center_cluster(cloud_parted, 0.2, 5, 2500);
+	cloud_center = center_cluster(cloud_parted, 0.2, 10, 2500);
 	
 	sensor_msgs::PointCloud2 output;
 	pcl::toROSMsg(cloud_center, output);
