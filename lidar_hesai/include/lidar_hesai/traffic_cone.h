@@ -237,12 +237,12 @@ double steerCreator(PointCloud cloud)
   		y = cloud.points[i].y;
   		z = cloud.points[i].z;
   		if(x < 0.0){
-  			if(right < 0 && (x*x + y*y) < 50.0) left = i;
-  			if(right >= 0 && ((x-cloud.points[right].x)*(x-cloud.points[right].x)+(y-cloud.points[right].y)*(y-cloud.points[right].y))<50.0) left = i; 
+  			if(right < 0 && (x*x + y*y) < 10.0) left = i;
+  			if(right >= 0 && (x*x + y*y) < 10.0) left = i; //最近的两对椎捅距离
   		}
   		else{
-  			if(left < 0 && (x*x + y*y) < 50.0) right = i;
-  			if(left >= 0 && ((x-cloud.points[left].x)*(x-cloud.points[left].x)+(y-cloud.points[left].y)*(y-cloud.points[left].y))<30.0) right = i; 
+  			if(left < 0 && (x*x + y*y) < 10.0) right = i;
+  			if(left >= 0 && (x*x + y*y) < 10.0) right = i; 
   		}
   		if(left >=0 && right >= 0){
 	  		center_x = (cloud.points[left].x+cloud.points[right].x)/2.0;
