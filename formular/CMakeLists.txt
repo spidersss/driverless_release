@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lidar_hesai)
+project(formular)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -210,14 +210,6 @@ add_executable(steer src/steer.cc)
 target_link_libraries(steer ${catkin_LIBRARIES})
 add_dependencies(steer ${catkin_EXPORTED_TARGETS})
 
-add_executable(parted2 src/parted2.cc)
-target_link_libraries(parted2 ${catkin_LIBRARIES})
-add_dependencies(parted2 ${catkin_EXPORTED_TARGETS})
-
-add_executable(traffic_cone src/traffic_cone.cc)
-target_link_libraries(traffic_cone ${catkin_LIBRARIES})
-add_dependencies(traffic_cone ${catkin_EXPORTED_TARGETS})
-
 add_executable(steer_tank src/steer_tank.cc)
 target_link_libraries(steer_tank ${catkin_LIBRARIES})
 add_dependencies(steer_tank ${catkin_EXPORTED_TARGETS})
@@ -225,3 +217,7 @@ add_dependencies(steer_tank ${catkin_EXPORTED_TARGETS})
 add_executable(parted2_bazi src/parted2_bazi.cc)
 target_link_libraries(parted2_bazi ${catkin_LIBRARIES})
 add_dependencies(parted2_bazi ${catkin_EXPORTED_TARGETS})
+
+add_executable(path_planning src/path_planning.cc)
+target_link_libraries(path_planning ${catkin_LIBRARIES})
+add_dependencies(path_planning ${catkin_EXPORTED_TARGETS})
