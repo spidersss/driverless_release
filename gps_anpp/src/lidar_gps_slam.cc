@@ -1,6 +1,14 @@
 #include "gps_anpp/lidar_gps_slam.h"
 #include <nav_msgs/Path.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <ros/console.h>
+#include <nav_msgs/Path.h>
+#include <std_msgs/String.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/tf.h>
+#define PI 3.1415927
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;  
 struct POS
 {
@@ -11,6 +19,8 @@ std::vector<POS> slam_pos;
 double lon_x;
 double lat_y;
 int count;
+ros::Time current_time, last_time;
+nav_msgs::Path path;
 class slam
 {
 public:
@@ -22,16 +32,50 @@ public:
 		pubslam = n.advertise<sensor_msgs::PointCloud2> ("trajectory", 10);
 		count = 0;
 	}
-	void gps_cb()
+	void gps_cb(const gps_anpp::gps_data::ConstPtr& gps_msg)
 	{
 		if(count < 5){//头5次确定初始点经纬度lon_x,lat_y;
-			lon_x += gps_msg.lat;
-			 
+			lon_x += gps_msg->lon;
+			lat_y += gps_msg->lat;
+			count++;
 		}
+		else if(count == 5){
+			lon_x /= 5;
+			lat_y /= 5;
+			count++;
+		}
+		else{
+			current_time = ros::Time::now();
+	   		last_time = ros::Time::now();
+
+			path.header.stamp=current_time;
+			path.header.frame_id="odom";
+			
+			x0 = cos(gps_msg->lat/180.0*PI)*(gps_msg->lon - lon_x)*111000;
+			y0 = (gps->lat - lat_y)*111000;
+			yaw = gps_msg->yaw/180.0*PI;
+			
+		    current_time = ros::Time::now();
+		    geometry_msgs::PoseStamped this_pose_stamped;
+		    this_pose_stamped.pose.position.x = x0;
+		    this_pose_stamped.pose.position.y = y0;
+
+		    geometry_msgs::Quaternion goal_quat = tf::createQuaternionMsgFromYaw(yaw);
+		    this_pose_stamped.pose.orientation.x = goal_quat.x;
+		    this_pose_stamped.pose.orientation.y = goal_quat.y;
+		    this_pose_stamped.pose.orientation.z = goal_quat.z;
+		    this_pose_stamped.pose.orientation.w = goal_quat.w;
+
+		    this_pose_stamped.header.stamp=current_time;
+		    this_pose_stamped.header.frame_id="odom";
+		    path.poses.push_back(this_pose_stamped);
+		    path_pub.publish(path);
+		    last_time = current_time;
+        }
 	}
 	void cloud_cb(const sensor_msgs::PointCloud2 &cloud_msg)
 	{
-		if(count == 5){
+		if(count > 5){
 		PointCloud cloud;
 		pcl::fromROSMsg(cloud_msg, cloud);
 		std::vector<pcl::PointXYZ, Eigen::aligned_allocator_indirection<pcl::PointXYZ> >::iterator it;
@@ -62,7 +106,7 @@ public:
 			pointxyz.y = slam_pos[i].y;
 			cloud_output.push_back(pointxyz);		
 		}
-		cloud_output.header.frame_id = "pandar";
+		cloud_output.header.frame_id = "odom";
  		cloud_output.width = cloud_center.points.size ();
 		cloud_output.height = 1;
 		cloud_output.is_dense = false;
